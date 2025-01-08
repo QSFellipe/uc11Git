@@ -8,7 +8,7 @@ public class conectaDAO {
     
     public Connection connectDB() throws ClassNotFoundException{
         Connection conn = null;
-        String url = "jdbc:mysql://localhost:3306/cenaflix";
+        String url = "jdbc:mysql://localhost:3306/uc11";
         String user = "root";
         String password = "Fal6250200407";
         
