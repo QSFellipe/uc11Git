@@ -1,7 +1,9 @@
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 public class ProdutosDAO {
     Connection conn;
@@ -28,7 +30,23 @@ public class ProdutosDAO {
         }
     }
 
-    public ArrayList<ProdutosDTO> listarProdutos() {
-        return listagem;
+    public ArrayList<ProdutosDTO> listarProdutos() throws ClassNotFoundException {
+        ArrayList<ProdutosDTO> lista = new ArrayList<>();
+        String sql = "SELECT * FROM produtos";
+
+        try (Connection conn = new conectaDAO().connectDB(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()){
+
+            while(rs.next()) {
+                ProdutosDTO produto = new ProdutosDTO();
+                produto.setId(rs.getInt("id"));
+                produto.setNome(rs.getString("nome"));
+                produto.setValor(rs.getInt("valor"));
+                produto.setStatus(rs.getString("status"));
+                lista.add(produto);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao buscar produtos: " + e.getMessage());
+        }
+        return lista;
     }
 }
