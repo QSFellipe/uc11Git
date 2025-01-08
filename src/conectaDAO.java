@@ -8,7 +8,7 @@ public class conectaDAO {
     
     public Connection connectDB() throws ClassNotFoundException{
         Connection conn = null;
-        String url = "jdbc:mysql://localhost:3306/uc11";
+        String url = "jdbc:mysql://localhost:3306/uc11?useSSL=false";
         String user = "root";
         String password = "Fal6250200407";
         
@@ -19,6 +19,6 @@ public class conectaDAO {
         } catch (SQLException erro){
             JOptionPane.showMessageDialog(null, "Erro ConectaDAO" + erro.getMessage());
         }
-        return conn;
+        return conn;        
     }
 }
