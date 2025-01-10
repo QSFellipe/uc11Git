@@ -1,16 +1,11 @@
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
-
-/**
- *
- * @author Adm
- */
 public class listagemVIEW extends javax.swing.JFrame {
 
     /**
@@ -136,17 +131,13 @@ public class listagemVIEW extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVenderActionPerformed
-        String id = id_produto_venda.getText();
-        
-        ProdutosDAO produtosdao = new ProdutosDAO();
-        
-        //produtosdao.venderProduto(Integer.parseInt(id));
+        venderProduto();
         listarProdutos();
     }//GEN-LAST:event_btnVenderActionPerformed
 
     private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
-        //vendasVIEW vendas = new vendasVIEW(); 
-        //vendas.setVisible(true);
+        vendasVIEW vendas = new vendasVIEW(); 
+        vendas.setVisible(true);
     }//GEN-LAST:event_btnVendasActionPerformed
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
@@ -201,25 +192,65 @@ public class listagemVIEW extends javax.swing.JFrame {
     private javax.swing.JTable listaProdutos;
     // End of variables declaration//GEN-END:variables
 
-    private void listarProdutos(){
+    private void listarProdutos() {
         try {
-            ProdutosDAO produtosdao = new ProdutosDAO();
-            
+            ProdutosDAO pDAO = new ProdutosDAO();
+
             DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
             model.setNumRows(0);
-            
-            ArrayList<ProdutosDTO> listagem = produtosdao.listarProdutos();
-            
-            for(int i = 0; i < listagem.size(); i++){
+
+            ArrayList<ProdutosDTO> listagem = pDAO.listarProdutos();
+
+            for (ProdutosDTO produto : listagem) {
                 model.addRow(new Object[]{
-                    listagem.get(i).getId(),
-                    listagem.get(i).getNome(),
-                    listagem.get(i).getValor(),
-                    listagem.get(i).getStatus()
+                    produto.getId(),
+                    produto.getNome(),
+                    produto.getValor(),
+                    produto.getStatus()
                 });
             }
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "ERRO!");
         }
-    
+    }
+
+    private void venderProduto() {
+        try {
+            if (id_produto_venda.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Para atualizar o status do produto digite o id do cadastro");
+            }
+
+            int idPesquisa = Integer.parseInt(id_produto_venda.getText());
+            ProdutosDAO pDao = new ProdutosDAO();
+            ProdutosDTO prod = pDao.getProdutosDTO(idPesquisa);
+
+            if (prod == null) {
+                JOptionPane.showMessageDialog(this, "Venda não registrada com o respectivo ID");
+                return;
+            }
+
+            if (prod.getStatus().equals("Vendido")) {
+                JOptionPane.showMessageDialog(null, "O cadastro com ID: " + idPesquisa + " já foi dado como Vendido");
+                return;
+            }
+
+            int resposta = JOptionPane.showConfirmDialog(null, "Deseja confirmar a venda do produto:\n"
+                    + "ID: " + prod.getId() + "\n"
+                    + "Nome: " + prod.getNome() + "\n"
+                    + "valor: " + prod.getValor()
+                    + JOptionPane.YES_NO_OPTION);
+
+            if (resposta == JOptionPane.YES_OPTION) {
+                pDao.atualizarStatus(prod);
+                
+                id_produto_venda.setText("");
+            } else {
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao consultar ID");
+        } catch (ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
     }
 }
