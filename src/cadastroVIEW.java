@@ -224,7 +224,6 @@ public class cadastroVIEW extends javax.swing.JFrame {
     }
     
     private boolean verificarCampos(){
-        
         if(cadastroNome.getText().isEmpty()){
             JOptionPane.showMessageDialog(null, "Preenchar o campo NOME para cadastrar");
             return true;

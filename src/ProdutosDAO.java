@@ -1,21 +1,24 @@
+
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 public class ProdutosDAO {
+
     Connection conn;
     PreparedStatement prep;
     private conectaDAO conexao;
     ArrayList<ProdutosDTO> listagem = new ArrayList<>();
-    
+
     public ProdutosDAO() throws ClassNotFoundException {
         this.conexao = new conectaDAO();
-        this.conn = this.conexao.connectDB();     
+        this.conn = this.conexao.connectDB();
     }
-    
+
     public void cadastrarProduto(ProdutosDTO produto) {
 
         try {
@@ -34,9 +37,9 @@ public class ProdutosDAO {
         ArrayList<ProdutosDTO> lista = new ArrayList<>();
         String sql = "SELECT * FROM produtos";
 
-        try (Connection conn = new conectaDAO().connectDB(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()){
+        try ( PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()) {
+            while (rs.next()) {
                 ProdutosDTO produto = new ProdutosDTO();
                 produto.setId(rs.getInt("id"));
                 produto.setNome(rs.getString("nome"));
@@ -48,5 +51,41 @@ public class ProdutosDAO {
             JOptionPane.showMessageDialog(null, "Erro ao buscar produtos: " + e.getMessage());
         }
         return lista;
+    }
+
+    public void atualizarStatus(ProdutosDTO produtos) {
+        String sql = "UPDATE produtos SET status = ? WHERE id = ?";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, "Vendido");
+            stmt.setInt(2, produtos.getId());
+            stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            System.out.println("Erro ao atualizar status de venda!");
+        }
+    }
+
+    ProdutosDTO getProdutosDTO(int idPesquisa) {
+        String sql = "SELECT * FROM produtos WHERE id = ?";
+        ProdutosDTO prod = null;
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, idPesquisa);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                prod = new ProdutosDTO();
+                prod.setId(rs.getInt("id"));
+                prod.setNome(rs.getString("nome"));
+                prod.setValor(rs.getInt("valor"));
+                prod.setStatus(rs.getString("status"));
+
+            }
+        } catch (SQLException sqle) {
+            JOptionPane.showMessageDialog(null, "Erro: " + sqle.getMessage());
+        }
+        return prod;
     }
 }
